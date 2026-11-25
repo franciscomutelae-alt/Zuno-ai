@@ -1,0 +1,229 @@
+{
+  "entities": {
+    "UserProfileDoc": {
+      "title": "UserProfileDoc",
+      "description": "Authenticated ZUNO AI user profile, plan metadata, preferences, and private settings isolated per user UID.",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "minLength": 4,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$",
+          "description": "Firebase Authentication UID of the account owner."
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120,
+          "description": "Display name of the user."
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "minLength": 3,
+          "maxLength": 180,
+          "description": "Verified account email address (PII)."
+        },
+        "avatar": {
+          "type": "string",
+          "maxLength": 1024,
+          "description": "Profile avatar URL."
+        },
+        "plan": {
+          "type": "string",
+          "enum": ["free", "premium", "pro", "ultra"],
+          "description": "Active subscription tier."
+        },
+        "role": {
+          "type": "string",
+          "enum": ["user", "admin"],
+          "description": "Account role managed server-side."
+        },
+        "status": {
+          "type": "string",
+          "enum": ["active", "blocked"],
+          "description": "Account moderation status."
+        },
+        "language": {
+          "type": "string",
+          "enum": ["pt", "en", "es", "fr"],
+          "description": "Preferred UI language."
+        },
+        "aiTone": {
+          "type": "string",
+          "enum": ["balanced", "creative", "precise", "friendly", "academic"],
+          "description": "Preferred AI assistant response tone."
+        },
+        "customInstructions": {
+          "type": "string",
+          "maxLength": 2000,
+          "description": "User custom AI system instructions."
+        },
+        "memoryEnabled": {
+          "type": "boolean",
+          "description": "Whether persistent AI memory is active."
+        },
+        "memories": {
+          "type": "array",
+          "description": "Bounded list of persistent user memory facts (max 50 items)."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server creation timestamp."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server last update timestamp."
+        }
+      },
+      "required": ["uid", "name", "email", "plan", "role", "status", "createdAt", "updatedAt"]
+    },
+    "ConversationDoc": {
+      "title": "ConversationDoc",
+      "description": "Private AI conversation owned by a single authenticated user.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$",
+          "description": "Unique conversation identifier."
+        },
+        "userId": {
+          "type": "string",
+          "minLength": 4,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$",
+          "description": "Owner Firebase UID."
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200,
+          "description": "Conversation title."
+        },
+        "model": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 80,
+          "description": "Model selected for this conversation."
+        },
+        "isPinned": {
+          "type": "boolean",
+          "description": "Whether the conversation is pinned."
+        },
+        "messageCount": {
+          "type": "number",
+          "description": "Number of messages in conversation."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server creation timestamp."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server update timestamp."
+        }
+      },
+      "required": ["id", "userId", "title", "model", "createdAt", "updatedAt"]
+    },
+    "GeneratedImageDoc": {
+      "title": "GeneratedImageDoc",
+      "description": "Metadata for an AI-generated image belonging strictly to the authenticated creator.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$",
+          "description": "Unique generated image identifier."
+        },
+        "userId": {
+          "type": "string",
+          "minLength": 4,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$",
+          "description": "Creator Firebase UID."
+        },
+        "prompt": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000,
+          "description": "Prompt used to synthesize the image."
+        },
+        "style": {
+          "type": "string",
+          "maxLength": 64,
+          "description": "Visual style preset."
+        },
+        "aspectRatio": {
+          "type": "string",
+          "maxLength": 16,
+          "description": "Image aspect ratio."
+        },
+        "model": {
+          "type": "string",
+          "maxLength": 100,
+          "description": "Image generation model."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server creation timestamp."
+        }
+      },
+      "required": ["id", "userId", "prompt", "style", "aspectRatio", "model", "createdAt"]
+    },
+    "AdminDoc": {
+      "title": "AdminDoc",
+      "description": "Server-managed administrator role document.",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "minLength": 4,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$",
+          "description": "Admin UID."
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "maxLength": 180,
+          "description": "Admin email."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Creation timestamp."
+        }
+      },
+      "required": ["uid", "email", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "#/entities/UserProfileDoc",
+      "description": "Private user account profile isolated by owner UID and verified email."
+    },
+    "/users/{userId}/conversations/{conversationId}": {
+      "schema": "#/entities/ConversationDoc",
+      "description": "Authenticated user conversation history isolated under parent user document."
+    },
+    "/users/{userId}/images/{imageId}": {
+      "schema": "#/entities/GeneratedImageDoc",
+      "description": "Authenticated user image metadata isolated under parent user document."
+    },
+    "/admins/{userId}": {
+      "schema": "#/entities/AdminDoc",
+      "description": "Trusted admin lookup table managed by founder/backend only."
+    }
+  }
+}

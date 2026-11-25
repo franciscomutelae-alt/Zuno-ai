@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="pt">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>ZUNO AI — Intelligence Without Limits</title>
+    <meta
+      name="description"
+      content="ZUNO AI — Intelligence Without Limits. Plataforma independente de inteligência artificial em tempo real, pesquisa inteligente, ferramentas avançadas e estúdio visual."
+    />
+    <meta name="application-name" content="ZUNO AI" />
+    <meta name="theme-color" content="#050814" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="robots" content="index, follow" />
+    <meta
+      name="keywords"
+      content="ZUNO AI, artificial intelligence, AI chat, image generator, AI tools, multilingual AI, productivity, zunoai.com"
+    />
+
+    <!-- Canonical & International Alternates -->
+    <link rel="canonical" href="https://zunoai.com/" />
+    <link rel="alternate" hreflang="x-default" href="https://zunoai.com/" />
+    <link rel="alternate" hreflang="pt" href="https://zunoai.com/" />
+    <link rel="alternate" hreflang="en" href="https://zunoai.com/" />
+    <link rel="alternate" hreflang="es" href="https://zunoai.com/" />
+    <link rel="alternate" hreflang="fr" href="https://zunoai.com/" />
+
+    <!-- Branded Favicons & PWA Touch Icons -->
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/pwa-192x192.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="ZUNO AI" />
+
+    <!-- OpenGraph Social Card -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="ZUNO AI" />
+    <meta property="og:title" content="ZUNO AI — Intelligence Without Limits" />
+    <meta
+      property="og:description"
+      content="ZUNO AI: plataforma internacional de inteligência artificial em tempo real, ferramentas especializadas e geração visual de alta definição."
+    />
+    <meta property="og:url" content="https://zunoai.com/" />
+    <meta property="og:image" content="https://zunoai.com/og-card.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content="pt_PT" />
+    <meta property="og:locale:alternate" content="pt_BR" />
+    <meta property="og:locale:alternate" content="en_US" />
+    <meta property="og:locale:alternate" content="es_ES" />
+    <meta property="og:locale:alternate" content="fr_FR" />
+
+    <!-- Twitter / X Social Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="ZUNO AI — Intelligence Without Limits" />
+    <meta
+      name="twitter:description"
+      content="Plataforma internacional de inteligência artificial em tempo real, pesquisa verificada e geração visual."
+    />
+    <meta name="twitter:image" content="https://zunoai.com/og-card.png" />
+
+    <!-- Structured Data (Schema.org WebApplication) -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "ZUNO AI",
+        "alternateName": "ZUNO AI Platform",
+        "slogan": "Intelligence Without Limits",
+        "url": "https://zunoai.com/",
+        "applicationCategory": "ProductivityApplication",
+        "operatingSystem": "Web, Android, iOS, Windows, macOS, Linux, ChromeOS",
+        "areaServed": "Worldwide",
+        "inLanguage": ["pt", "en", "es", "fr"],
+        "description": "Plataforma internacional independente de inteligência artificial em tempo real com ferramentas especializadas e estúdio criativo.",
+        "creator": {
+          "@type": "Person",
+          "name": "Francisco Mutela Emanuel"
+        },
+        "publisher": {
+          "@type": "Organization",
+          "name": "ZUNO AI",
+          "url": "https://zunoai.com/",
+          "logo": "https://zunoai.com/pwa-512x512.png"
+        }
+      }
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      html,
+      body {
+        margin: 0;
+        background-color: #050814;
+        color: #f1f5f9;
+        font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      }
+      .zuno-boot-splash {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 18px;
+        background: radial-gradient(circle at 30% 25%, rgba(37, 99, 235, 0.16), transparent 45%),
+          radial-gradient(circle at 75% 75%, rgba(168, 85, 247, 0.16), transparent 45%),
+          #050814;
+      }
+      .zuno-boot-badge {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 22px;
+        border-radius: 18px;
+        background: rgba(8, 13, 30, 0.92);
+        border: 1px solid rgba(59, 130, 246, 0.28);
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+      }
+      .zuno-boot-title {
+        font-size: 22px;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        color: #ffffff;
+      }
+      .zuno-boot-title span {
+        background: linear-gradient(90deg, #38bdf8, #a855f7);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+      .zuno-boot-slogan {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        color: #93c5fd;
+      }
+    </style>
+
+    <script>
+      // Suppress external browser extension unhandled rejections cleanly
+      window.addEventListener('unhandledrejection', function (event) {
+        var reason = event.reason;
+        var msg = (typeof reason === 'string' ? reason : (reason && reason.message) || '') + '';
+        var stack = (reason && reason.stack) || '';
+        if (
+          msg.includes('chrome: call method') ||
+          msg.includes('Window message') ||
+          msg.includes('WebSocket closed without opened') ||
+          stack.includes('chrome-extension://') ||
+          stack.includes('moz-extension://') ||
+          stack.includes('ff-content.js')
+        ) {
+          event.preventDefault();
+          event.stopImmediatePropagation();
+        }
+      });
+      window.addEventListener('error', function (event) {
+        var filename = event.filename || '';
+        var msg = (event.message || '') + '';
+        if (
+          filename.includes('chrome-extension://') ||
+          filename.includes('moz-extension://') ||
+          filename.includes('ff-content.js') ||
+          msg.includes('chrome: call method')
+        ) {
+          event.preventDefault();
+          event.stopImmediatePropagation();
+        }
+      });
+    </script>
+  </head>
+  <body>
+    <div id="root">
+      <div class="zuno-boot-splash" aria-label="A carregar ZUNO AI">
+        <div class="zuno-boot-badge">
+          <img src="/icon.svg" alt="ZUNO AI" width="38" height="38" />
+          <div class="zuno-boot-title">ZUNO <span>AI</span></div>
+        </div>
+        <div class="zuno-boot-slogan">Intelligence Without Limits</div>
+      </div>
+    </div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

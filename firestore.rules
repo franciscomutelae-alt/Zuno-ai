@@ -1,0 +1,226 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // 1. Global Safety Net (Default Deny)
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // ----------------------------------------------------
+    // Global Hardened Helpers
+    // ----------------------------------------------------
+    function isValidId(id) {
+      return id is string && id.size() >= 2 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isVerifiedUser() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isOwner(userId) {
+      return isVerifiedUser() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isVerifiedUser() && (
+        request.auth.token.email == 'franciscomutelae@gmail.com' ||
+        request.auth.token.email == 'diegofrancisco26@gmail.com' ||
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+      );
+    }
+
+    // Master Gate: verify active parent account before allowing subcollection operations
+    function isParentAccountActive(userId) {
+      return exists(/databases/$(database)/documents/users/$(userId)) &&
+        get(/databases/$(database)/documents/users/$(userId)).data.status == 'active';
+    }
+
+    // ----------------------------------------------------
+    // Validation Blueprints
+    // ----------------------------------------------------
+    function isValidUserProfileData(data, userId) {
+      return data.keys().hasAll(['uid', 'name', 'email', 'plan', 'role', 'status', 'createdAt', 'updatedAt'])
+        && data.keys().hasOnly([
+          'uid', 'name', 'email', 'avatar', 'plan', 'role', 'status',
+          'language', 'aiTone', 'customInstructions', 'memoryEnabled',
+          'memories', 'createdAt', 'updatedAt'
+        ])
+        && isValidId(data.uid)
+        && data.uid == userId
+        && data.name is string && data.name.size() >= 1 && data.name.size() <= 120
+        && data.email is string && data.email.size() >= 3 && data.email.size() <= 180
+        && data.plan in ['free', 'premium', 'pro', 'ultra']
+        && data.role in ['user', 'admin']
+        && data.status in ['active', 'blocked']
+        && (!('avatar' in data) || (data.avatar is string && data.avatar.size() <= 1024))
+        && (!('language' in data) || data.language in ['pt', 'en', 'es', 'fr'])
+        && (!('aiTone' in data) || data.aiTone in ['balanced', 'creative', 'precise', 'friendly', 'academic'])
+        && (!('customInstructions' in data) || (data.customInstructions is string && data.customInstructions.size() <= 2000))
+        && (!('memoryEnabled' in data) || data.memoryEnabled is bool)
+        && (!('memories' in data) || (data.memories is list && data.memories.size() <= 50 && (data.memories.size() == 0 || data.memories[0] is string)))
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidConversationData(data, userId, conversationId) {
+      return data.keys().hasAll(['id', 'userId', 'title', 'model', 'createdAt', 'updatedAt'])
+        && data.keys().hasOnly(['id', 'userId', 'title', 'model', 'isPinned', 'messageCount', 'createdAt', 'updatedAt'])
+        && isValidId(data.id)
+        && data.id == conversationId
+        && isValidId(data.userId)
+        && data.userId == userId
+        && data.title is string && data.title.size() >= 1 && data.title.size() <= 200
+        && data.model is string && data.model.size() >= 2 && data.model.size() <= 80
+        && (!('isPinned' in data) || data.isPinned is bool)
+        && (!('messageCount' in data) || (data.messageCount is number && data.messageCount >= 0 && data.messageCount <= 5000))
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidImageData(data, userId, imageId) {
+      return data.keys().hasAll(['id', 'userId', 'prompt', 'style', 'aspectRatio', 'model', 'createdAt'])
+        && data.keys().hasOnly(['id', 'userId', 'prompt', 'style', 'aspectRatio', 'model', 'createdAt'])
+        && isValidId(data.id)
+        && data.id == imageId
+        && isValidId(data.userId)
+        && data.userId == userId
+        && data.prompt is string && data.prompt.size() >= 1 && data.prompt.size() <= 2000
+        && data.style is string && data.style.size() >= 1 && data.style.size() <= 64
+        && data.aspectRatio is string && data.aspectRatio.size() >= 1 && data.aspectRatio.size() <= 16
+        && data.model is string && data.model.size() >= 1 && data.model.size() <= 100
+        && data.createdAt is timestamp;
+    }
+
+    function isValidAdminData(data, userId) {
+      return data.keys().hasAll(['uid', 'email', 'createdAt'])
+        && data.keys().hasOnly(['uid', 'email', 'createdAt'])
+        && isValidId(data.uid)
+        && data.uid == userId
+        && data.email is string && data.email.size() >= 3 && data.email.size() <= 180
+        && data.createdAt is timestamp;
+    }
+
+    // ----------------------------------------------------
+    // Collections Match Blocks
+    // ----------------------------------------------------
+
+    // Connection health probe document
+    match /test/{docId} {
+      allow get: if docId == 'connection';
+    }
+
+    // Trusted admin lookup documents
+    match /admins/{userId} {
+      allow get: if isValidId(userId) && (isOwner(userId) || isAdmin());
+      allow list: if isAdmin();
+      allow create: if isValidId(userId)
+        && isAdmin()
+        && isValidAdminData(incoming(), userId)
+        && incoming().createdAt == request.time;
+      allow update, delete: if false;
+    }
+
+    // Private user profiles isolated by owner UID
+    match /users/{userId} {
+      allow get: if isValidId(userId) && (isOwner(userId) || isAdmin());
+      allow list: if isVerifiedUser() && (resource.data.uid == request.auth.uid || isAdmin());
+
+      allow create: if isValidId(userId)
+        && isOwner(userId)
+        && isValidUserProfileData(incoming(), userId)
+        && incoming().createdAt == request.time
+        && incoming().updatedAt == request.time
+        && incoming().status == 'active'
+        && (
+          isAdmin() || (
+            incoming().role == 'user' &&
+            incoming().plan == 'free'
+          )
+        );
+
+      allow update: if isValidId(userId)
+        && isValidUserProfileData(incoming(), userId)
+        && incoming().uid == existing().uid
+        && incoming().createdAt == existing().createdAt
+        && incoming().updatedAt == request.time
+        && (
+          isAdmin() || (
+            isOwner(userId)
+            && existing().status == 'active'
+            && incoming().role == existing().role
+            && incoming().plan == existing().plan
+            && incoming().status == existing().status
+            && incoming().diff(existing()).affectedKeys().hasOnly([
+              'name', 'avatar', 'language', 'aiTone',
+              'customInstructions', 'memoryEnabled', 'memories', 'updatedAt'
+            ])
+          )
+        );
+
+      allow delete: if isValidId(userId) && (isOwner(userId) || isAdmin());
+
+      // Conversations subcollection strictly isolated per owner
+      match /conversations/{conversationId} {
+        allow get: if isValidId(userId) && isValidId(conversationId) && (isOwner(userId) || isAdmin());
+        allow list: if isVerifiedUser() && (resource.data.userId == request.auth.uid || isAdmin());
+
+        allow create: if isValidId(userId)
+          && isValidId(conversationId)
+          && isOwner(userId)
+          && isValidConversationData(incoming(), userId, conversationId)
+          && incoming().createdAt == request.time
+          && incoming().updatedAt == request.time
+          && isParentAccountActive(userId);
+
+        allow update: if isValidId(userId)
+          && isValidId(conversationId)
+          && isValidConversationData(incoming(), userId, conversationId)
+          && incoming().id == existing().id
+          && incoming().userId == existing().userId
+          && incoming().createdAt == existing().createdAt
+          && incoming().updatedAt == request.time
+          && (
+            isAdmin() || (
+              isOwner(userId)
+              && isParentAccountActive(userId)
+              && incoming().diff(existing()).affectedKeys().hasOnly([
+                'title', 'model', 'isPinned', 'messageCount', 'updatedAt'
+              ])
+            )
+          );
+
+        allow delete: if isValidId(userId) && isValidId(conversationId) && (isOwner(userId) || isAdmin());
+      }
+
+      // Generated images subcollection strictly isolated per owner
+      match /images/{imageId} {
+        allow get: if isValidId(userId) && isValidId(imageId) && (isOwner(userId) || isAdmin());
+        allow list: if isVerifiedUser() && (resource.data.userId == request.auth.uid || isAdmin());
+
+        allow create: if isValidId(userId)
+          && isValidId(imageId)
+          && isOwner(userId)
+          && isValidImageData(incoming(), userId, imageId)
+          && incoming().createdAt == request.time
+          && isParentAccountActive(userId);
+
+        allow update: if false;
+        allow delete: if isValidId(userId) && isValidId(imageId) && (isOwner(userId) || isAdmin());
+      }
+    }
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "name": "ZUNO AI",
+  "description": "Plataforma internacional de inteligência artificial com chat inteligente em tempo real, ferramentas avançadas e motor Gemini.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -18,9 +18,20 @@ export default defineConfig(() => {
                 '/* ZUNO: HMR WebSocket disabled in preview */'
               )
               .replace(
+                'throw new SendBeforeConnectError("send was called before connect");',
+                'return;'
+              )
+              .replace(
+                'throw new SendBeforeConnectError("invoke was called before connect");',
+                'return;'
+              )
+              .replace(
                 /new WebSocket\(/g,
                 'void 0 && new WebSocket('
               );
+          }
+          if (id.includes('pwa-entry-point-loaded')) {
+            return 'export default function registerDevSW() {}';
           }
         },
       },
